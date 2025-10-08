@@ -1,0 +1,41 @@
+# Ignore les fichiers et répertoires générés par Composer.
+# Le cœur de Drupal, les modules et thèmes contribués, ainsi que les bibliothèques
+# doivent être gérés via composer.json.
+/vendor/
+/web/core/
+/web/modules/contrib/
+/web/themes/contrib/
+/web/profiles/contrib/
+/web/libraries/
+
+# Ignore les fichiers de configuration qui peuvent contenir des informations sensibles.
+# Le fichier settings.php est souvent versionné, mais pas sa version locale.
+/web/sites/*/settings.local.php
+/web/sites/*/development.services.yml
+
+# Ignore les répertoires de fichiers générés par Drupal (fichiers uploadés, etc.).
+/web/sites/*/files/
+/web/sites/*/private/
+
+# Ignore les fichiers de cache et de compilation PHP de Twig.
+/web/sites/*/php/
+
+# Ignore les répertoires de test de Drupal.
+/web/sites/simpletest/
+
+# Ignore les dépendances front-end si vous utilisez npm/yarn.
+/node_modules/
+
+# Ignore les fichiers générés par les systèmes d'exploitation.
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Ignore les fichiers de configuration des IDE.
+.idea/
+.vscode/
+*.swp
