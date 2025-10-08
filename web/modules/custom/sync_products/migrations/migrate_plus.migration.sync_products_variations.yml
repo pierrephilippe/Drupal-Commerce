@@ -1,0 +1,48 @@
+id: sync_products_variations
+label: 'Synchronisation des variations de produit depuis DummyJSON'
+migration_group: commerce
+
+source:
+  # Le plugin 'url' est fourni par migrate_plus
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: json
+  # L'URL de notre API
+  urls: 'https://dummyjson.com/products?limit=50'
+  # Le chemin vers les items dans le JSON
+  item_selector: /products
+  # Les champs que nous allons utiliser depuis la source
+  fields:
+    - name: sku
+      label: 'SKU'
+      selector: sku
+    - name: product_id
+      label: 'Product ID'
+      selector: id
+    - name: price
+      label: 'Price'
+      selector: price
+    - name: category
+      label: 'Category'
+      selector: category
+  # On définit une clé unique pour chaque item source pour le suivi de la migration
+  ids:
+    product_id:
+      type: integer
+
+process:
+  # On définit le type de variation. 'default' est le type par défaut de Commerce.
+  type:
+    plugin: default_value
+    default_value: default
+  # Le SKU est obligatoire et doit être unique. On le génère à partir de l'ID du produit.
+  sku:
+    plugin: concat
+    source:
+      - '@product_id'
+    delimiter: '-'
+    process:
+      - plugin: machine_name
+
+destination:
+  plugin: 'entity:commerce_product_variation'

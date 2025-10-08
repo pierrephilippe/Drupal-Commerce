@@ -1,0 +1,61 @@
+id: sync_products_products
+label: 'Synchronisation des produits depuis DummyJSON'
+migration_group: commerce
+
+source:
+  # On réutilise la même source que pour les variations
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: json
+  urls: 'https://dummyjson.com/products?limit=50'
+  item_selector: /products
+  fields:
+    - name: product_id
+      label: 'Product ID'
+      selector: id
+    - name: title
+      label: 'Title'
+      selector: title
+    - name: description
+      label: 'Description'
+      selector: description
+    - name: category
+      label: 'Category'
+      selector: category
+  ids:
+    product_id:
+      type: integer
+
+process:
+  # On cherche dynamiquement le type de produit en se basant sur la catégorie.
+  type:
+    plugin: migration_lookup
+    migration: sync_product_types
+    source: category
+  # Le titre du produit
+  title: title
+  # Le corps/description du produit
+  body/value: description
+  body/format:
+    plugin: default_value
+    default_value: basic_html
+  # Les produits doivent être assignés à un ou plusieurs magasins.
+  stores:
+    plugin: default_value
+    default_value: 1 # ID du magasin par défaut
+  # C'est la partie la plus importante : lier la variation au produit.
+  variations:
+    plugin: migration_lookup
+    # On cherche dans la migration précédente.
+    migration: sync_products_variations
+    # La source pour la recherche est l'ID du produit.
+    source: product_id
+
+destination:
+  plugin: 'entity:commerce_product'
+  # On spécifie que la migration des variations doit être exécutée avant celle-ci.
+  migration_dependencies:
+    required:
+      # L'ordre est important : d'abord les types, puis les variations.
+      - sync_product_types
+      - sync_products_variations

@@ -1,0 +1,108 @@
+@startuml
+' Titre: Modèle de données étendu de Drupal Commerce
+title Modèle de données étendu de Drupal Commerce
+
+' Style
+skinparam linetype ortho
+skinparam handwritten false
+skinparam classAttributeIconSize 0
+
+hide empty members
+
+!define ENTITY class
+!define CONFIG_ENTITY class
+ENTITY "User\n(user)" as User
+
+ENTITY "Store\n(commerce_store)" as Store {
+  + name
+  + address
+  + currency
+}
+
+ENTITY "Product\n(commerce_product)" as Product {
+  + title
+  + body
+  + stores
+}
+
+ENTITY "Product Variation\n(commerce_product_variation)" as ProductVariation {
+  + sku
+  + price
+  + title
+}
+
+ENTITY "Order\n(commerce_order)" as Order {
+  + order_number
+  + mail
+  + state
+  + total_price
+}
+
+ENTITY "Profile\n(profile)" as Profile {
+  + address
+  + ...
+}
+
+ENTITY "Order Item\n(commerce_order_item)" as OrderItem {
+  + quantity
+  + unit_price
+  + total_price
+}
+
+ENTITY "Payment\n(commerce_payment)" as Payment {
+  + amount
+  + state
+  + completed
+}
+
+CONFIG_ENTITY "Payment Gateway\n(commerce_payment_gateway)" as PaymentGateway {
+  + plugin
+  + configuration
+}
+
+ENTITY "Payment Method\n(commerce_payment_method)" as PaymentMethod {
+  + type
+  + payment_gateway_id
+  + ...
+}
+
+ENTITY "Promotion\n(commerce_promotion)" as Promotion {
+  + name
+  + offer
+  + conditions
+}
+
+ENTITY "Coupon\n(commerce_promotion_coupon)" as Coupon {
+  + code
+  + usage_limit
+}
+
+ENTITY "Shipment\n(commerce_shipment)" as Shipment {
+  + items
+  + amount
+  + tracking_code
+}
+
+Store "1" -- "0..*" Product : "est disponible dans"
+Product "1" -- "1..*" ProductVariation : "a"
+ProductVariation "1" -- "0..*" OrderItem : "est commandé dans"
+Order "1" -- "1..*" OrderItem : "contient"
+Store "1" -- "0..*" Order : "traite"
+
+User "1" -- "0..*" Order : "passe"
+
+Order "1" -- "1" Profile : "a une adresse de facturation"
+Order "1" -- "0..1" Profile : "a une adresse de livraison"
+User "1" -- "0..*" Profile : "a un carnet d'adresses de"
+
+Order "1" -- "0..*" Payment : "est payé par"
+Payment "1" -- "1" PaymentGateway : "utilise"
+Payment "0..*" -- "0..1" PaymentMethod : "utilise"
+User "1" -- "0..*" PaymentMethod : "enregistre"
+
+Order "1" -- "0..*" Promotion : "bénéficie de"
+Promotion "1" -- "0..*" Coupon : "peut avoir des"
+
+Order "1" -- "0..*" Shipment : "a"
+
+@enduml

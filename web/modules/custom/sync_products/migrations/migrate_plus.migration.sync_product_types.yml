@@ -1,0 +1,41 @@
+id: sync_product_types
+label: 'Synchronisation des types de produit depuis DummyJSON'
+migration_group: commerce
+
+source:
+  # On utilise la même source que les autres migrations
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: json
+  urls: 'https://dummyjson.com/products?limit=50'
+  item_selector: /products
+  fields:
+    - name: category
+      label: 'Category'
+      selector: category
+  # La catégorie elle-même servira d'ID unique pour la source.
+  # La migration ignorera automatiquement les doublons.
+  ids:
+    category:
+      type: string
+
+process:
+  # 'id' est le nom machine du type de produit.
+  # On le génère à partir du nom de la catégorie.
+  id:
+    plugin: machine_name
+    source: category
+
+  # 'label' est le nom lisible par un humain.
+  label:
+    plugin: callback
+    callable: ucfirst
+    source: category
+
+  variation_types:
+    plugin: default_value
+    default_value:
+      - default
+
+destination:
+  plugin: 'entity:commerce_product_type'

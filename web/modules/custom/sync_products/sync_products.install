@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the MONMODULE module.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function sync_products_uninstall() {
+  // Liste des noms de configuration à supprimer (sans le suffixe .yml).
+  $configs_to_delete = [
+    'migrate_plus.migration.sync_product_types',
+    'migrate_plus.migration.sync_products_variations',
+    'migrate_plus.migration.sync_products_products',
+  ];
+
+  $config_factory = \Drupal::configFactory();
+
+  foreach ($configs_to_delete as $config_name) {
+    if ($config_factory->getEditable($config_name)) {
+      $config_factory->getEditable($config_name)->delete();
+    }
+  }
+}

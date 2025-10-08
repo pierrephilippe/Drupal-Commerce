@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Fichier d'installation pour le module my_module_typst_pdf.
+ */
+
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
+
+/**
+ * Implémente hook_requirements().
+ */
+function my_module_typst_pdf_requirements($phase) {
+  $requirements = [];
+
+  if ($phase == 'runtime') {
+    $requirements['typst'] = [
+      'title' => t('Typst binary'),
+    ];
+
+    // Utilise l'utilitaire de Symfony pour trouver l'exécutable.
+    $finder = new ExecutableFinder();
+    $typst_path = $finder->find('typst');
+
+    if ($typst_path) {
+      // L'exécutable a été trouvé, on essaie de récupérer sa version.
+      $process = new Process([$typst_path, '--version']);
+      $process->run();
+
+      if ($process->isSuccessful()) {
+        $requirements['typst']['value'] = t('Typst est installé.');
+        // Affiche la version trouvée.
+        $requirements['typst']['description'] = t('Version : @version', ['@version' => trim($process->getOutput())]);
+        $requirements['typst']['severity'] = REQUIREMENT_OK;
+      }
+    }
+    else {
+      // L'exécutable n'a pas été trouvé dans le PATH.
+      $requirements['typst']['value'] = t('Typst non trouvé');
+      $requirements['typst']['description'] = t('Le binaire Typst doit être installé sur le serveur et accessible dans le PATH du système. Veuillez consulter la documentation du module.');
+      $requirements['typst']['severity'] = REQUIREMENT_ERROR;
+    }
+  }
+
+  return $requirements;
+}

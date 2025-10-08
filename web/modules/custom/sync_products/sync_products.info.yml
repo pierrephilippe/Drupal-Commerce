@@ -1,0 +1,8 @@
+name: 'Sync Products'
+type: module
+description: 'Migre des produits depuis une API JSON vers Drupal Commerce.'
+core_version_requirement: ^10 || ^11
+package: Commerce
+dependencies:
+  - drupal:migrate_plus
+  - commerce:commerce_product
